@@ -4,28 +4,31 @@ import requests
 import pprint
 
 
-apikey = '4429faaaa08bd6135bd6b3c567c46811'
-lat =44.34
-lon =10.99
-url = f"https://api.openweathermap.org/data/2.5/forecast?lat=57&lon=-2.15&cnt=100&appid={apikey}&units=imperial"
-
-
-r =  requests.get(url)
-requested_json = r.json()
-pprint.pprint(requested_json['city']['name'])
-
-count_of_list= len(requested_json['list'])
-time_of_weather =[]
-for i in range(count_of_list):
-  get_item = requested_json['list'][i]['dt']
-  convert_time = datetime.fromtimestamp(get_item).strftime('%Y-%m-%d %H:%M:%S')
-  temperature = requested_json['list'][i]['main']['temp']
-  print(temperature)
-  description = requested_json['list'][i]['weather'][0]['description']
-  print(description)
-  print( convert_time)
-
-print("Whole Data")
-pprint.pprint(requested_json)
-
-#pprint.pprint(requested_json['list'])
+def get_weather_forecast(lat=57, lon=-2.15, apikey = '4429faaaa08bd6135bd6b3c567c46811', units='imperial'):
+  """get the weahter forecast for the next 5 day for each3 hours
+      lat: latitude of the city
+      lon:longitude of the city
+      apikey: apikey from openweathermap
+      units:get the Celcuis degree for temperature
+      You may change the defination and get the new data results  
+  """
+  
+  url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&cnt=100&appid={apikey}&units={units}"
+    
+  r =  requests.get(url)
+  requested_json = r.json()
+  city = requested_json['city']['name']
+  name_of_data = f"data_{city}_{datetime.today()}"
+  print(f"{name_of_data}.txt file created")
+  with open(f"{name_of_data}.txt","a") as file:
+    for object in requested_json['list']:
+      #loop over the content list element
+      #city = requested_json['city']['name']
+      get_item = object['dt']
+      time_w = datetime.fromtimestamp(get_item).strftime('%Y-%m-%d %H:%M:%S')
+      temperature= object['main']['temp']
+      description = object['weather'][0]['description']
+  
+      file.write(f"{city },{time_w},{temperature},{description}\n")
+    
+get_weather_forecast()
